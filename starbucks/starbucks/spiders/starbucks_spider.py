@@ -5,30 +5,6 @@ import sys
 import os 
 import csv
 import re
-
-# # If there is a command-line argument, and the argument is a valid file, this matches
-# if len(sys.argv) > 1 and os.path.exists(sys.argv[1]):
-#     csv_path = sys.argv[1]
-# else:
-#     csv_path = r'D:\clovi\Projetos\Python\Usuarios.csv'
-
-# csv_reader = pandas.read_csv(csv_path,encoding='utf-8')
-
-# j=0
-# y = csv_reader.iloc[-1].values[0]
-
-# while True:
-#     i=0
-#     x = csv_reader.iloc[j].values
-#     usuario = x[i]
-#     i+=1
-#     pase = x[i]
-#     j+=1
-#     if usuario == y:
-#         edistribucion(usuario,pase)
-#         break
-#     else:
-#         edistribucion(usuario,pase)
                 
 class StarbucksSpider(Spider):
     name = 'starbucks_spider'
@@ -99,15 +75,6 @@ class StarbucksSpider(Spider):
         us_starbucks.reset_index(inplace = True, drop = True) 
         
         city_state_urls = list(set([(city, states[state_initials], f"https://www.city-data.com/city/{city}-{states[state_initials]}.html".replace(' ', '-').lower()) for city,state_initials in zip(us_starbucks['City'], us_starbucks['State/Province'])]))
-        # for i in range(len(us_starbucks)):
-        #     city  = us_starbucks['City'][i]
-        #     state_initials = us_starbucks['State/Province'][i]
-        #     state = states[state_initials]
-        #     url = f'https://www.city-data.com/city/{city}-{state}.html'
-        #     url_list.append(url)
-        # url_list = list(set([a.replace(' ' , '-')for a in url_list]))
-        # for i in range(len(url_list)):
-        #     url_list[i] = url_list[i].lower()
 
         for city, state, url in city_state_urls[1546::-1]:
             yield Request(url=url, callback=self.parse_city_page, meta={'state': state, 'city': city})
@@ -121,8 +88,6 @@ class StarbucksSpider(Spider):
             population = int(re.findall('\d+',pop_section)[0])
             percent_urban = None 
             percent_rural = None     
-        # print('='*50)
-        # print(population, percent_urban, percent_rural)
         
         age_city, age_state = response.xpath('//*[(@id = "median-age")]//text()').extract()[1:4:2]
         age_city = float(age_city[0:4])
@@ -138,8 +103,6 @@ class StarbucksSpider(Spider):
         nearest_city_over_1E6pop = nearest_city_over_1E6pop.split(',')[0] 
         distance_to_nearest_city = float(re.findall('\d+\.?\d*',distance_to_nearest_city)[0])
     
-
-
         lesbian_couples_percent_self_reported, gay_couples_percent_self_reported = response.xpath('//*[(@id = "households-stats")]//text()').extract()[-8:-3:4] 
         lesbian_couples_percent_self_reported =  float(re.findall('\d+\.?\d*',lesbian_couples_percent_self_reported)[0])
         gay_couples_percent_self_reported = float(re.findall('\d+\.?\d*',gay_couples_percent_self_reported)[0])
